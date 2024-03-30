@@ -1,43 +1,51 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: abausa-v <abausa-v@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/03/30 16:31:33 by abausa-v          #+#    #+#              #
+#    Updated: 2024/03/30 16:34:41 by abausa-v         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 NAME = pipex
 
-SRC_PATH = sources/
-OBJ_PATH = obj/
-CC = gcc
-CFLAGS = -Wall -Werror -Wextra -g
+SRC = sources/pipex.c \
+      sources/pipex_utils.c
 
-SRC = checker.c \
-	cmd.c \
-	error.c \
-	free_path.c \
-	pipex.c \
-	process.c
+OBJ_DIR = obj
+OBJS = $(addprefix $(OBJ_DIR)/, $(notdir $(patsubst %.c,%.o,$(SRC))))
 
-SRCS = $(addprefix $(SRC_PATH), $(SRC))
-OBJ = $(SRC:.c=.o)
-OBJS = $(addprefix $(OBJ_PATH), $(OBJ))
-INCS = -I ./includes/
+CC = cc
+RM = rm -rf
+CFLAGS = -Wall -Wextra -Werror -g
+INCLUDE = -I include
+MAKE = make -C
+LIBFT_PATH = libft
+LIBFT = -L ${LIBFT_PATH} -lft
 
-all: $(OBJ_PATH) $(NAME)
+$(OBJ_DIR)/%.o: sources/%.c
+	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
-$(OBJ_PATH)%.o: $(SRC_PATH)%.c | $(OBJ_PATH)
-	$(CC) $(CFLAGS) -c $< -o $@ $(INCS)
+$(NAME): $(OBJ_DIR) $(OBJS)
+	$(MAKE) $(LIBFT_PATH) all
+	$(CC) $(OBJS) $(LIBFT) -o $(NAME)
 
-$(OBJ_PATH):
-	mkdir $(OBJ_PATH)
+all: $(NAME)
 
-$(NAME): $(OBJS) libft/libft.a
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) -Llibft/ -lft
-
-libft/libft.a:
-	make -C libft/
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
 
 clean:
-	rm -rf $(OBJ_PATH)
-	make -C libft/ clean
+	$(MAKE) $(LIBFT_PATH) clean
+	$(RM) $(OBJS)
+	$(RM) $(OBJ_DIR)
 
 fclean: clean
-	rm -rf $(NAME)
-	make -C libft/ fclean
+	$(MAKE) $(LIBFT_PATH) fclean
+	$(RM) $(NAME)
 
 re: fclean all
 
