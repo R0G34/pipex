@@ -17,14 +17,32 @@
 # include <fcntl.h>
 # include <sys/wait.h>
 # include <sys/types.h>
-# include <signal.h>
+# include <unistd.h>
+# include <stdlib.h>
+# include <stdio.h>
+# include <string.h>
 
-void	sub_process(int *fd, char **argv, char **envp);
-void	main_process(int *fd, char **argv, char **envp);
-void	exit_error(void);
-void	custom_error(char *header, char *msg);
-void	free_split(char **str);
-char	*get_cmd_path(char *cmd, char **envp);
-void	run_cmd(char *cmd, char **envp);
+// Estructura para manejar los datos necesarios
+typedef struct s_pipex
+{
+    int     pipefd[2];
+    int     infile;
+    int     outfile;
+    char    *cmd1;
+    char    *cmd2;
+    pid_t   child1;
+    pid_t   child2;
+}           t_pipex;
+
+// Declaraciones de funciones
+void    child_process1(t_pipex pipex);
+void    child_process2(t_pipex pipex);
+void    exit_error(void);
+void    custom_error(char *header, char *msg);
+void    free_split(char **str);
+char    *get_cmd_path(char *cmd, char **envp);
+char    *ft_strjoin_free(char *s1, char *s2, int free_s1);
+void    run_cmd(char *cmd, char **envp);
+void    handle_error(const char *msg, int fd1, int fd2);
 
 #endif

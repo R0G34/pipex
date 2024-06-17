@@ -12,71 +12,58 @@
 
 #include "../includes/pipex.h"
 
-void	check_envp(char **envp)
+void	initialize_pipex(t_pipex *pipex, char **argv)
 {
-	int	i;
-	int	check;
-
-	i = -1;
-	check = 0;
-	while (envp[++i])
-		if (ft_strnstr(envp[i], "PATH=", 5) && envp[i][6])
-			check = 1;
-	if (!check)
-	{
-		custom_error("Error", "The environment PATH has no values.");
-		exit(1);
-	}
+	if (pipe(pipex->pipefd) == -1)
+		handle_error("pipe", -1, -1);
+	pipex->infile = open(argv[1], O_RDONLY);
+	if (pipex->infile < 0)
+		handle_error("open infile", -1, -1);
+	pipex->outfile = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (pipex->outfile < 0)
+		handle_error("open outfile", pipex->infile, -1);
+	pipex->cmd1 = argv[2];
+	pipex->cmd2 = argv[3];
 }
 
-void	sub_process(int *fd, char **argv, char **envp)
+void	create_child_processes(t_pipex *pipex)
 {
-	int	fd_in;
-
-	fd_in = open(argv[1], O_RDONLY, 0777);
-	if (fd_in == -1)
-		exit_error();
-	dup2(fd[1], STDOUT_FILENO);
-	dup2(fd_in, STDIN_FILENO);
-	close(fd[0]);
-	run_cmd(argv[2], envp);
+	pipex->child1 = fork();
+	if (pipex->child1 == -1)
+		handle_error("fork", pipex->infile, pipex->outfile);
+	if (pipex->child1 == 0)
+		child_process1(*pipex);
+	pipex->child2 = fork();
+	if (pipex->child2 == -1)
+	{
+		waitpid(pipex->child1, NULL, 0);
+		handle_error("fork", pipex->infile, pipex->outfile);
+	}
+	if (pipex->child2 == 0)
+		child_process2(*pipex);
 }
 
-void	main_process(int *fd, char **argv, char **envp)
+void	close_pipes_and_wait(t_pipex *pipex)
 {
-	int	fd_out;
-
-	fd_out = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
-	if (fd_out == -1)
-		exit_error();
-	dup2(fd[0], STDIN_FILENO);
-	dup2(fd_out, STDOUT_FILENO);
-	close(fd[1]);
-	run_cmd(argv[3], envp);
+	close(pipex->pipefd[0]);
+	close(pipex->pipefd[1]);
+	close(pipex->infile);
+	close(pipex->outfile);
+	waitpid(pipex->child1, NULL, 0);
+	waitpid(pipex->child2, NULL, 0);
 }
 
-int	main(int argc, char **argv, char **envp)
+int	main(int argc, char **argv)
 {
-	int		fd[2];
-	pid_t	pid;
+	t_pipex	pipex;
 
-	check_envp(envp);
-	if (argc == 5)
+	if (argc != 5)
 	{
-		if (pipe(fd) == -1)
-			exit_error();
-		pid = fork();
-		if (pid == -1)
-			exit_error();
-		if (pid == 0)
-			sub_process(fd, argv, envp);
-		waitpid(pid, NULL, 0);
-		main_process(fd, argv, envp);
+		ft_printf("Usage: ./pipex file1 cmd1 cmd2 file2\n");
+		return (1);
 	}
-	else
-	{
-		custom_error("Error", "Wrong number of arguments");
-		custom_error("Correct Input", "./pipex <file1> <cmd1> <cmd2> <file2>");
-		exit(1);
-	}
+	initialize_pipex(&pipex, argv);
+	create_child_processes(&pipex);
+	close_pipes_and_wait(&pipex);
+	return (0);
 }

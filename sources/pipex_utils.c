@@ -12,76 +12,81 @@
 
 #include "../includes/pipex.h"
 
-void	exit_error(void)
+extern char	**environ;
+
+void	child_process1(t_pipex pipex)
 {
-	perror("Error");
+	char	**args;
+	char	*cmd_path;
+
+	args = ft_split(pipex.cmd1, ' ');
+	cmd_path = get_cmd_path(args[0], environ);
+	if (!cmd_path)
+	{
+		perror("Command not found");
+		free_split(args);
+		exit(EXIT_FAILURE);
+	}
+	dup2(pipex.infile, 0);
+	dup2(pipex.pipefd[1], 1);
+	close(pipex.pipefd[0]);
+	close(pipex.infile);
+	close(pipex.pipefd[1]);
+	execve(cmd_path, args, environ);
+	perror("execve");
+	free(cmd_path);
+	free_split(args);
 	exit(EXIT_FAILURE);
 }
 
-void	custom_error(char *header, char *msg)
+void	child_process2(t_pipex pipex)
 {
-	ft_putstr_fd(header, 2);
-	ft_putstr_fd(": ", 2);
-	ft_putstr_fd(msg, 2);
-	ft_putstr_fd("\n", 2);
-}
+	char	**args;
+	char	*cmd_path;
 
-void	free_split(char **str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-		free(str[i++]);
-	free(str);
+	args = ft_split(pipex.cmd2, ' ');
+	cmd_path = get_cmd_path(args[0], environ);
+	if (!cmd_path)
+	{
+		perror("Command not found");
+		free_split(args);
+		exit(EXIT_FAILURE);
+	}
+	dup2(pipex.pipefd[0], 0);
+	dup2(pipex.outfile, 1);
+	close(pipex.pipefd[1]);
+	close(pipex.outfile);
+	close(pipex.pipefd[0]);
+	execve(cmd_path, args, environ);
+	perror("execve");
+	free(cmd_path);
+	free_split(args);
+	exit(EXIT_FAILURE);
 }
 
 char	*get_cmd_path(char *cmd, char **envp)
 {
-	char	**envp_paths;
+	char	*path_var;
+	char	**paths;
 	char	*cmd_path;
 	int		i;
-	char	*only_path;
 
-	i = 0;
-	while (!ft_strnstr(envp[i], "PATH=", 5))
-		i++;
-	envp_paths = ft_split(envp[i] + 5, ':');
-	i = -1;
-	while (envp_paths[++i])
+	path_var = getenv("PATH");
+	if (!path_var)
+		return (NULL);
+	paths = ft_split(path_var, ':');
+	while (paths[i])
 	{
-		only_path = ft_strjoin(envp_paths[i], "/");
-		cmd_path = ft_strjoin(only_path, cmd);
-		free (only_path);
-		if (access(cmd_path, F_OK) == 0)
+		cmd_path = ft_strjoin(paths[i], "/");
+		cmd_path = ft_strjoin_free(cmd_path, cmd, 1);
+		if (access(cmd_path, X_OK) == 0)
 		{
-			free_split(envp_paths);
+			free_split(paths);
 			return (cmd_path);
 		}
 		free(cmd_path);
+		i++;
 	}
-	free_split(envp_paths);
-	custom_error(cmd, "command not found");
+	free_split(paths);
 	return (NULL);
-}
-
-void	run_cmd(char *cmd, char **envp)
-{
-	char	**cmd_and_flags;
-	char	*path;
-
-	cmd_and_flags = ft_split(cmd, ' ');
-	path = get_cmd_path(cmd_and_flags[0], envp);
-	if (!path)
-	{
-		free_split(cmd_and_flags);
-		free (path);
-		exit(127);
-	}
-	if (execve(path, cmd_and_flags, envp) == -1)
-	{
-		free_split(cmd_and_flags);
-		free (path);
-		exit_error();
-	}
 }
