@@ -6,7 +6,7 @@
 #    By: abausa-v <abausa-v@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/09/15 11:19:51 by fsantill          #+#    #+#              #
-#    Updated: 2024/06/17 14:18:35 by abausa-v         ###   ########.fr        #
+#    Updated: 2024/06/17 16:13:12 by abausa-v         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -50,7 +50,8 @@ FT=		ft_isalpha.c		\
 		ft_printf.c			\
 		ft_printf_utils.c	\
 		ft_strjoin_free.c	\
-		ft_strcat.c
+		ft_strcat.c			\
+		ft_strcpy.c
 
 OBJ=$(FT:%.c=%.o)
 

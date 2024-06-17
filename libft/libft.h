@@ -6,7 +6,7 @@
 /*   By: abausa-v <abausa-v@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/06 19:24:03 by abausa-v          #+#    #+#             */
-/*   Updated: 2024/06/17 14:22:22 by abausa-v         ###   ########.fr       */
+/*   Updated: 2024/06/17 16:15:56 by abausa-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ void			*ft_bzero(void *dest, size_t count);
 void			*ft_memcpy(void *dest, const void *src, size_t count);
 void			*ft_memmove(void *dest, const void *src, size_t count);
 size_t			ft_strlcpy(char *dest, const char *src, size_t size);
+char			*ft_strcpy(char *dest, const char *src);
 size_t			ft_strlcat(char *dest, const char *src, size_t size);
 int				ft_toupper(int c);
 int				ft_tolower(int c);
