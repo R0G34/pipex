@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: abausa-v <abausa-v@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/30 15:28:05 by abausa-v          #+#    #+#             */
-/*   Updated: 2024/03/30 16:28:07 by abausa-v         ###   ########.fr       */
+/*   Created: 2024/06/17 16:38:00 by abausa-v          #+#    #+#             */
+/*   Updated: 2024/06/17 16:38:16 by abausa-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 # include <stdio.h>
 # include <string.h>
 
-// Estructura para manejar los datos necesarios
 typedef struct s_pipex
 {
     int     pipefd[2];
@@ -34,7 +33,6 @@ typedef struct s_pipex
     pid_t   child2;
 }           t_pipex;
 
-// Declaraciones de funciones
 void    child_process1(t_pipex pipex);
 void    child_process2(t_pipex pipex);
 void    exit_error(void);

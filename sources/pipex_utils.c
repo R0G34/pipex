@@ -6,13 +6,13 @@
 /*   By: abausa-v <abausa-v@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 16:26:35 by abausa-v          #+#    #+#             */
-/*   Updated: 2024/03/30 16:26:56 by abausa-v         ###   ########.fr       */
+/*   Updated: 2024/06/17 16:43:33 by abausa-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 
-extern char	**environ;
+extern char **environ;
 
 void	child_process1(t_pipex pipex)
 {
@@ -71,10 +71,12 @@ char	*get_cmd_path(char *cmd, char **envp)
 	char	*cmd_path;
 	int		i;
 
+	(void)envp;
 	path_var = getenv("PATH");
 	if (!path_var)
 		return (NULL);
 	paths = ft_split(path_var, ':');
+	i = 0;
 	while (paths[i])
 	{
 		cmd_path = ft_strjoin(paths[i], "/");
@@ -89,4 +91,27 @@ char	*get_cmd_path(char *cmd, char **envp)
 	}
 	free_split(paths);
 	return (NULL);
+}
+
+void	handle_error(const char *msg, int fd1, int fd2)
+{
+	perror(msg);
+	if (fd1 >= 0)
+		close(fd1);
+	if (fd2 >= 0)
+		close(fd2);
+	exit(EXIT_FAILURE);
+}
+
+void	free_split(char **str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		free(str[i]);
+		i++;
+	}
+	free(str);
 }

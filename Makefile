@@ -6,47 +6,38 @@
 #    By: abausa-v <abausa-v@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/30 16:31:33 by abausa-v          #+#    #+#              #
-#    Updated: 2024/03/30 16:34:41 by abausa-v         ###   ########.fr        #
+#    Updated: 2024/06/17 16:36:25 by abausa-v         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = pipex
 
-SRC = sources/pipex.c \
-      sources/pipex_utils.c
+CC = gcc
+CFLAGS = -Wall -Wextra -Werror
+LIBFT_DIR = ./libft
+LIBFT = $(LIBFT_DIR)/libft.a
 
-OBJ_DIR = obj
-OBJS = $(addprefix $(OBJ_DIR)/, $(notdir $(patsubst %.c,%.o,$(SRC))))
-
-CC = cc
-RM = rm -rf
-CFLAGS = -Wall -Wextra -Werror -g
-INCLUDE = -I include
-MAKE = make -C
-LIBFT_PATH = libft
-LIBFT = -L ${LIBFT_PATH} -lft
-
-$(OBJ_DIR)/%.o: sources/%.c
-	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
-
-$(NAME): $(OBJ_DIR) $(OBJS)
-	$(MAKE) $(LIBFT_PATH) all
-	$(CC) $(OBJS) $(LIBFT) -o $(NAME)
+SRCS = sources/pipex.c sources/pipex_utils.c
+OBJS = $(SRCS:.c=.o)
+INCLUDES = -Iincludes -I$(LIBFT_DIR)
 
 all: $(NAME)
 
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
+$(NAME): $(OBJS) $(LIBFT)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) -o $(NAME)
+
+$(LIBFT):
+	$(MAKE) -C $(LIBFT_DIR)
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
-	$(MAKE) $(LIBFT_PATH) clean
-	$(RM) $(OBJS)
-	$(RM) $(OBJ_DIR)
+	$(MAKE) -C $(LIBFT_DIR) clean
+	rm -f $(OBJS)
 
 fclean: clean
-	$(MAKE) $(LIBFT_PATH) fclean
-	$(RM) $(NAME)
+	$(MAKE) -C $(LIBFT_DIR) fclean
+	rm -f $(NAME)
 
 re: fclean all
-
-.PHONY: all clean fclean re
