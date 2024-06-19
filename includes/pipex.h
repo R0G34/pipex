@@ -6,7 +6,7 @@
 /*   By: abausa-v <abausa-v@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/17 16:38:00 by abausa-v          #+#    #+#             */
-/*   Updated: 2024/06/17 16:38:16 by abausa-v         ###   ########.fr       */
+/*   Updated: 2024/06/19 11:01:14 by abausa-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ typedef struct s_pipex
     pid_t   child2;
 }           t_pipex;
 
-void    child_process1(t_pipex pipex);
-void    child_process2(t_pipex pipex);
+void    child_process1(t_pipex pipex, char **envp);
+void    child_process2(t_pipex pipex, char **envp);
 void    exit_error(void);
 void    custom_error(char *header, char *msg);
 void    free_split(char **str);

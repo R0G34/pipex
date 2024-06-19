@@ -6,11 +6,21 @@
 /*   By: abausa-v <abausa-v@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 16:27:39 by abausa-v          #+#    #+#             */
-/*   Updated: 2024/03/30 16:27:44 by abausa-v         ###   ########.fr       */
+/*   Updated: 2024/06/19 11:09:51 by abausa-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
+
+void	handle_error(const char *msg, int fd1, int fd2)
+{
+	perror(msg);
+	if (fd1 >= 0)
+		close(fd1);
+	if (fd2 >= 0)
+		close(fd2);
+	exit(EXIT_FAILURE);
+}
 
 void	initialize_pipex(t_pipex *pipex, char **argv)
 {
@@ -26,13 +36,13 @@ void	initialize_pipex(t_pipex *pipex, char **argv)
 	pipex->cmd2 = argv[3];
 }
 
-void	create_child_processes(t_pipex *pipex)
+void	create_child_processes(t_pipex *pipex, char **envp)
 {
 	pipex->child1 = fork();
 	if (pipex->child1 == -1)
 		handle_error("fork", pipex->infile, pipex->outfile);
 	if (pipex->child1 == 0)
-		child_process1(*pipex);
+		child_process1(*pipex, envp);
 	pipex->child2 = fork();
 	if (pipex->child2 == -1)
 	{
@@ -40,7 +50,7 @@ void	create_child_processes(t_pipex *pipex)
 		handle_error("fork", pipex->infile, pipex->outfile);
 	}
 	if (pipex->child2 == 0)
-		child_process2(*pipex);
+		child_process2(*pipex, envp);
 }
 
 void	close_pipes_and_wait(t_pipex *pipex)
@@ -53,7 +63,7 @@ void	close_pipes_and_wait(t_pipex *pipex)
 	waitpid(pipex->child2, NULL, 0);
 }
 
-int	main(int argc, char **argv)
+int	main(int argc, char **argv, char **envp)
 {
 	t_pipex	pipex;
 
@@ -63,7 +73,7 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	initialize_pipex(&pipex, argv);
-	create_child_processes(&pipex);
+	create_child_processes(&pipex, envp);
 	close_pipes_and_wait(&pipex);
 	return (0);
 }

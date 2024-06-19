@@ -6,21 +6,19 @@
 /*   By: abausa-v <abausa-v@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 16:26:35 by abausa-v          #+#    #+#             */
-/*   Updated: 2024/06/17 16:43:33 by abausa-v         ###   ########.fr       */
+/*   Updated: 2024/06/19 11:11:57 by abausa-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 
-extern char **environ;
-
-void	child_process1(t_pipex pipex)
+void	child_process1(t_pipex pipex, char **envp)
 {
 	char	**args;
 	char	*cmd_path;
 
 	args = ft_split(pipex.cmd1, ' ');
-	cmd_path = get_cmd_path(args[0], environ);
+	cmd_path = get_cmd_path(args[0], envp);
 	if (!cmd_path)
 	{
 		perror("Command not found");
@@ -32,20 +30,20 @@ void	child_process1(t_pipex pipex)
 	close(pipex.pipefd[0]);
 	close(pipex.infile);
 	close(pipex.pipefd[1]);
-	execve(cmd_path, args, environ);
+	execve(cmd_path, args, envp);
 	perror("execve");
 	free(cmd_path);
 	free_split(args);
 	exit(EXIT_FAILURE);
 }
 
-void	child_process2(t_pipex pipex)
+void	child_process2(t_pipex pipex, char **envp)
 {
 	char	**args;
 	char	*cmd_path;
 
 	args = ft_split(pipex.cmd2, ' ');
-	cmd_path = get_cmd_path(args[0], environ);
+	cmd_path = get_cmd_path(args[0], envp);
 	if (!cmd_path)
 	{
 		perror("Command not found");
@@ -57,7 +55,7 @@ void	child_process2(t_pipex pipex)
 	close(pipex.pipefd[1]);
 	close(pipex.outfile);
 	close(pipex.pipefd[0]);
-	execve(cmd_path, args, environ);
+	execve(cmd_path, args, envp);
 	perror("execve");
 	free(cmd_path);
 	free_split(args);
@@ -72,6 +70,8 @@ char	*get_cmd_path(char *cmd, char **envp)
 	int		i;
 
 	(void)envp;
+	if (access(cmd, X_OK) == 0)
+		return (ft_strdup(cmd));
 	path_var = getenv("PATH");
 	if (!path_var)
 		return (NULL);
@@ -91,16 +91,6 @@ char	*get_cmd_path(char *cmd, char **envp)
 	}
 	free_split(paths);
 	return (NULL);
-}
-
-void	handle_error(const char *msg, int fd1, int fd2)
-{
-	perror(msg);
-	if (fd1 >= 0)
-		close(fd1);
-	if (fd2 >= 0)
-		close(fd2);
-	exit(EXIT_FAILURE);
 }
 
 void	free_split(char **str)
