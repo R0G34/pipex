@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: abausa-v <abausa-v@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/17 16:38:00 by abausa-v          #+#    #+#             */
-/*   Updated: 2024/06/19 11:01:14 by abausa-v         ###   ########.fr       */
+/*   Created: 2024/06/21 17:38:45 by abausa-v          #+#    #+#             */
+/*   Updated: 2024/06/21 19:08:42 by abausa-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,33 +14,24 @@
 # define PIPEX_H
 
 # include "../libft/libft.h"
-# include <fcntl.h>
+# include <stdbool.h>
 # include <sys/wait.h>
-# include <sys/types.h>
-# include <unistd.h>
+# include <errno.h>
 # include <stdlib.h>
+# include <fcntl.h>
+# include <unistd.h>
 # include <stdio.h>
-# include <string.h>
 
-typedef struct s_pipex
+typedef struct s_fd
 {
-    int     pipefd[2];
-    int     infile;
-    int     outfile;
-    char    *cmd1;
-    char    *cmd2;
-    pid_t   child1;
-    pid_t   child2;
-}           t_pipex;
+	int	file_in;
+	int	file_out;
+}	t_fd;
 
-void    child_process1(t_pipex pipex, char **envp);
-void    child_process2(t_pipex pipex, char **envp);
-void    exit_error(void);
-void    custom_error(char *header, char *msg);
-void    free_split(char **str);
-char    *get_cmd_path(char *cmd, char **envp);
-char    *ft_strjoin_free(char *s1, char *s2, int free_s1);
-void    run_cmd(char *cmd, char **envp);
-void    handle_error(const char *msg, int fd1, int fd2);
+int		**open_pipes(t_fd *fds, int argc);
+char	**envp_parsing(char **envp);
+void	do_execve(int i, char **cmd, char **paths, char **envp);
+void	my_exec(char **cmd, char **envp);
+bool	pipex(int **pipes, int argc, char **argv, char **envp);
 
 #endif

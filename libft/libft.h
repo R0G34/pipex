@@ -6,7 +6,7 @@
 /*   By: abausa-v <abausa-v@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/06 19:24:03 by abausa-v          #+#    #+#             */
-/*   Updated: 2024/06/17 16:15:56 by abausa-v         ###   ########.fr       */
+/*   Updated: 2024/06/19 13:14:50 by abausa-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,8 @@ char			*get_next_line(int fd);
 int				ft_strlen_to_limit(char *str, int delimiter);
 char			*ft_strchr_mod(char *str, int c);
 char			*ft_strdup_mod(char *str);
-char			*ft_strjoin_mod(char *s1, char *s2);
+// char			*ft_strjoin_mod(char *s1, char *s2);
+char			*ft_strjoin_free(char *s1, char *s2, int free_s1);
 char			*ft_strcat(char *dest, const char *src);
 char			*ft_substr_mod(char *s, unsigned int start, size_t len);
 
